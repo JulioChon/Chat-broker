@@ -22,8 +22,8 @@ import org.itson.chatbroker.Dominio.PaqueteDatos;
 public class Broker{
 static int puertoServidor = 9090;
 static int puertoCliente = 9091;
-static List<String> direccionesClientes = new ArrayList();
-static List<String> direccionesServidores = new ArrayList();
+//static List<String> direccionesClientes = new ArrayList();
+//static List<String> direccionesServidores = new ArrayList();
 static List<Socket> direccionesServerSocket = new ArrayList();
 static List<Socket> direccionesClienteSocket = new ArrayList();
 static Thread hiloCliente;

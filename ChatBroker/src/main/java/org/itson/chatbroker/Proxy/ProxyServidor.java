@@ -26,6 +26,7 @@ PaqueteDatos paqueteEnvioDatos;
 PaqueteDatos paqueteReciboDatos;
 int puerto = 9090;    
 Socket servidorSocket;
+final String ip = "localhost";
     
     public ProxyServidor(){   
     }
@@ -34,7 +35,7 @@ Socket servidorSocket;
     }
     public void iniciarSocket(){
     try {
-        servidorSocket = new Socket("10.178.2.94", puerto);
+        servidorSocket = new Socket(ip, puerto);
         PaqueteDatos paquete = new PaqueteDatos(Mensaje.SERVER);
         ObjectOutputStream paqueteDatos = new ObjectOutputStream(servidorSocket.getOutputStream());
         paqueteDatos.writeObject(paquete);

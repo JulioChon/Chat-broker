@@ -9,9 +9,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import static org.itson.chatbroker.Broker.Broker.direccionesClientes;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.itson.chatbroker.Broker.Broker.puertoCliente;
-import static org.itson.chatbroker.Broker.Broker.puertoServidor;
 import org.itson.chatbroker.Dominio.PaqueteDatos;
 
 /**
@@ -25,18 +25,13 @@ public class BrokerCliente implements Runnable {
             ServerSocket socketBroker = new ServerSocket(puertoCliente);
             while (true) {
                 Socket socketCliente;
-                String direccionCliente;
-                System.out.println("antes");
+                //String direccionCliente;
                 socketCliente = socketBroker.accept();
-                System.out.println("despues del accep");
-                direccionCliente = socketCliente.getInetAddress().getHostAddress();
-                if (!Broker.direccionesClienteSocket.contains(socketBroker)) {
-                    Broker.direccionesClientes.add(direccionCliente);
+                //direccionCliente = socketCliente.getInetAddress().getHostAddress();
+                    //Broker.direccionesClientes.add(direccionCliente);
                     Broker.direccionesClienteSocket.add(socketCliente);
                     Thread hilo = new Thread(new enviarInformacionCliente(socketCliente));
                     hilo.start();
-                    System.out.println("hilo");
-                }
             }
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
@@ -57,10 +52,10 @@ public class BrokerCliente implements Runnable {
 
         }
 
-        public static void enviarInformacionServidor(Socket socketCliente) {
+        public void enviarInformacionServidor(Socket socketCliente) throws IOException {
             try {
                 while (true) {
-                    System.out.println("otro hilo");
+                    BrokerServidor.socketRemitente = socketCliente;
                     PaqueteDatos paqueteDatosRecibido;
                     ObjectInputStream paqueteDatos = new ObjectInputStream(socketCliente.getInputStream());
                     Socket socketEnviarServidor = Broker.direccionesServerSocket.get(0);
@@ -68,17 +63,29 @@ public class BrokerCliente implements Runnable {
                     ObjectOutputStream paqueteDatosEnvio = new ObjectOutputStream(socketEnviarServidor.getOutputStream());
                     paqueteDatosEnvio.writeObject(paqueteDatosRecibido);
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.out.println(ex.getMessage());
+            } catch (IOException | ClassNotFoundException ex) {
 
+                this.eliminarConexion();
+            }
+        }
+
+        public void eliminarConexion() {
+            try {
+                Broker.direccionesClienteSocket.remove(socketCliente);
+                this.socketCliente.close();
+            } catch (IOException ex) {
+                System.out.println("Error al cerrar la conexion");
             }
         }
 
         @Override
         public void run() {
 
-            enviarInformacionServidor(socketCliente);
+            try {
+                enviarInformacionServidor(socketCliente);
+            } catch (IOException ex) {
+                Logger.getLogger(BrokerCliente.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
     }
