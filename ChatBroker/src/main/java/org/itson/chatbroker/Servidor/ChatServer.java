@@ -17,7 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.itson.chatbroker.ChatBroker;
 import org.itson.chatbroker.Dominio.PaqueteDatos;
+import org.itson.chatbroker.Conexiones.ConexionServidor;
 import org.itson.chatbroker.Proxy.ProxyServidor;
 
 /**
@@ -32,9 +34,7 @@ public class ChatServer{
     final static int puerto = 9090;
     static ProxyServidor proxyServidor;
     static List<PaqueteDatos> historialChat = new ArrayList();
-    //final static Thread hilo = new Thread(new ChatServer());
-   // static PaqueteDatos paqueteDatosRecibido;
-    //static List<ObjectOutputStream> outputStreams = new ArrayList<>();
+
     
     public static void main(String[] args) {
     iniciarServidor();
@@ -44,7 +44,7 @@ public class ChatServer{
         try{
          proxyServidor = new ProxyServidor();
          proxyServidor.iniciarSocket();
-         proxyServidor.run();
+         proxyServidor.iniciarHilo();
          
         }catch(Exception ex){
             System.out.println(ex.getMessage());
@@ -53,8 +53,9 @@ public class ChatServer{
     
     public static void actualizarHistorial(PaqueteDatos paqueteDatos){
         historialChat.add(paqueteDatos);
-        proxyServidor.enviarDatos(paqueteDatos);
+        proxyServidor.enviarDatos();
     }
+    
     
 
 
